@@ -9,20 +9,23 @@ import "./PlaceForm.css";
 import { useForm } from "../../shared/components/hooks/form-hooks";
 
 const NewPlace = () => {
-  const [formState, inputHandler] = useForm({
-    title: {
-      value: "",
-      isValid: false,
+  const [formState, inputHandler] = useForm(
+    {
+      title: {
+        value: "",
+        isValid: false,
+      },
+      description: {
+        value: "",
+        isValid: false,
+      },
+      address: {
+        value: "",
+        isValid: false,
+      },
     },
-    description: {
-      value: "",
-      isValid: false,
-    },
-    address: {
-      value: "",
-      isValid: false,
-    },
-  });
+    true
+  );
 
   const placeSubmitHandler = (event) => {
     event.preventDefault();
