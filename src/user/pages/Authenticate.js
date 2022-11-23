@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "../../shared/components/hooks/form-hooks";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
+  VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -10,9 +11,10 @@ import "./Authenticate.css";
 import Card from "../../shared/components/UIElements/Card";
 
 const Authenticate = () => {
-  const [formState, inputHandler] = useForm(
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [formState, inputHandler, setFormData] = useForm(
     {
-      userName: {
+      email: {
         value: "",
         isValid: false,
       },
@@ -24,26 +26,59 @@ const Authenticate = () => {
     false
   );
 
-  const authSubmitHandler = evt => {
+  const switchModeHandler = () => {
+    if (!isLoginMode) {
+      setFormData(
+        {
+          ...formState.inputs,
+          name: undefined,
+        },
+        formState.inputs.email.isValid && formState.inputs.password.isValid
+      );
+    } else {
+      setFormData(
+        {
+          ...formState.inputs,
+          name: {
+            value: "",
+            isValid: false,
+          },
+        },
+        false
+      );
+    }
+    setIsLoginMode((prevMode) => !prevMode);
+  };
+
+  const authSubmitHandler = (evt) => {
     evt.preventDefault();
     console.log(formState.inputs);
   };
 
   return (
     <Card className="authentication">
-      <h2>Login Required</h2>
+      <h2>{isLoginMode ? "Login Required" : "Sign up for account"}</h2>
       <hr />
       <form onSubmit={authSubmitHandler}>
+        {!isLoginMode && (
+          <Input
+            element="input"
+            id="name"
+            type="text"
+            label="Your Name"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Please enter a name."
+            onInput={inputHandler}
+          />
+        )}
         <Input
-          id="Email"
+          id="email"
           element="input"
           type="email"
           label="E-Mail"
           validators={[VALIDATOR_EMAIL()]}
           errorText="Please enter a valid email."
           onInput={inputHandler}
-          initialValue={formState.inputs.userName.value}
-          initialValid={formState.inputs.userName.isValid}
         />
         <Input
           element="input"
@@ -53,11 +88,14 @@ const Authenticate = () => {
           validators={[VALIDATOR_MINLENGTH(5)]}
           errorText="Please enter a valid password (min 5 chars)"
           onInput={inputHandler}
-          initialValue={formState.inputs.password.value}
-          initialValid={formState.inputs.password.isValid}
         />
-        <Button type="submit" disabled={formState.isValid}>Submit</Button>
+        <Button type="submit" disabled={!formState.isValid}>
+          {isLoginMode ? "LOGIN" : "SIGNUP"}
+        </Button>
       </form>
+      <Button onClick={switchModeHandler} inverse>
+        SWITCH TO {isLoginMode ? "SIGNUP" : "LOGIN"}
+      </Button>
     </Card>
   );
 };
