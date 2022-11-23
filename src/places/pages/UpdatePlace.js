@@ -9,7 +9,6 @@ import Button from "../../shared/components/FormElements/Button";
 import Card from "../../shared/components/UIElements/Card";
 import { useForm } from "../../shared/components/hooks/form-hooks";
 import "./PlaceForm.css";
-
 const DUMMY_PLACES = [
   {
     id: "p1",

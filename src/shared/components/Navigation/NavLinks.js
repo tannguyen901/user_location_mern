@@ -19,5 +19,4 @@ const NavLinks = props => {
     </li>
   </ul>
 };
-
 export default NavLinks;
