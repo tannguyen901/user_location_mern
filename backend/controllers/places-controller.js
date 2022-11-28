@@ -1,6 +1,7 @@
 const HttpError = require("../models/http-error");
+const { v4: uuidv4 } = require("uuid");
 
-const DUMMY_PLACES = [
+let DUMMY_PLACES = [
   {
     id: "p1",
     title: "Empite State Building",
@@ -43,6 +44,7 @@ const getPlaceByUserId = (req, res, next) => {
 const createPlace = (req, res, next) => {
   const { title, description, coordinates, address, creator } = req.body;
   const createdPlace = {
+    id: uuidv4(),
     title,
     description,
     location: coordinates,
@@ -55,6 +57,32 @@ const createPlace = (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
+const patchPlaceById = (req, res, next) => {
+  const { title, description } = req.body;
+  const placeId = req.params.pid;
+
+  const placeToUpdate = {
+    ...DUMMY_PLACES.find((place) => place.id === placeId),
+  };
+  const placeIndex = DUMMY_PLACES.findIndex((place) => place.id === placeId);
+
+  placeToUpdate.title = title;
+  placeToUpdate.description = description;
+
+  DUMMY_PLACES[placeIndex] = placeToUpdate;
+
+  res.status(200).json({ place: placeToUpdate });
+};
+
+const deletePlaceById = (req, res, next) => {
+  const placeId = req.params.pid;
+  DUMMY_PLACES = DUMMY_PLACES.filter((place) => place.id !== placeId);
+
+  res.status(200).json({ message: "Deleted place." });
+};
+
 exports.getPlaceById = getPlaceById;
 exports.getPlaceByUserId = getPlaceByUserId;
 exports.createPlace = createPlace;
+exports.patchPlaceById = patchPlaceById;
+exports.deletePlaceById = deletePlaceById;
