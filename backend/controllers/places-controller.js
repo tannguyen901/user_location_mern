@@ -1,14 +1,15 @@
 const HttpError = require("../models/http-error");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
+const Place = require("../models/place");
 
 const getCoordsForAddress = require("../util/location");
 
 let DUMMY_PLACES = [
   {
     id: "p1",
-    title: "Empite State Building",
-    description: "One of hte most famous sky scrapers in the world!",
+    title: "Empire State Building",
+    description: "One of the most famous sky scrapers in the world!",
     location: {
       lat: 40.7484474,
       lng: -73.9871516,
@@ -47,9 +48,9 @@ const getPlacesByUserId = (req, res, next) => {
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
-    res.status(errors);
-    next(new HttpError("Invalid inputs passed, please check your data", 422));
+    return next(
+      new HttpError("Invalid inputs passed, please check your data", 422)
+    );
   }
   const { title, description, address, creator } = req.body;
 
@@ -60,17 +61,36 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuidv4(),
+  // const createdPlace = {
+  //   id: uuidv4(),
+  //   title,
+  //   description,
+  //   location: coordinates,
+  //   address,
+  //   creator,
+  // };
+
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/400px-Empire_State_Building_%28aerial_view%29.jpg",
     creator,
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace);
+  try {
+    await createdPlace.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Creating place failed, please try again.",
+      500
+    );
+    return next(error);
+  }
 
+  // DUMMY_PLACES.push(createdPlace);
   res.status(201).json({ place: createdPlace });
 };
 

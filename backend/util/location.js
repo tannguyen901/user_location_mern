@@ -16,7 +16,6 @@ const getCoordsForAddress = async (address) => {
         );
         
         const data = response.data;
-        
         // Check if no matches were found
         if (!data || data.candidates.length === 0) {
             const error = new HttpError(
@@ -37,7 +36,6 @@ return {
 };
 };
 module.exports = getCoordsForAddress;
-
 
 // const axios = require("axios");
 // const API_KEY = "AIzaSyAXr6nyP7MdQzD0-HzTqx4NtTnn29Ue6L0";
