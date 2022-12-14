@@ -27,12 +27,12 @@ app.use((error, req, res, next) => {
 });
 
 const connectUrl =
-  'mongodb+srv://tannguyen:dbpassword123@cluster0.j4p5kyv.mongodb.net/places?retryWrites=true&w=majority';
-const connectConfig = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-};
+  "mongodb+srv://tannguyen:dbpassword123@cluster0.j4p5kyv.mongodb.net/places?retryWrites=true&w=majority";
+// const connectConfig = {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useCreateIndex: true,
+// };
 
 mongoose
   .connect(connectUrl)

@@ -19,22 +19,36 @@ let DUMMY_PLACES = [
   },
 ];
 
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
-  const place = DUMMY_PLACES.find((p) => {
-    return p.id === placeId;
-  });
+
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a place",
+      500
+    );
+    return next(error);
+  }
 
   if (!place) {
     throw new HttpError("Could not find a place for the provided id.", 404);
   }
-  res.json({ place });
+
+  res.json({ place: place.toObject({ getters: true }) });
 };
 
 const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter((p) => {
-    return p.creator === userId;
+  let place;
+  try {
+    const places = Places.find(userId);
+    } catch (err) {
+
+  };
+
   });
   if (!places || places.length === 0) {
     return next(
@@ -42,7 +56,7 @@ const getPlacesByUserId = (req, res, next) => {
       404
     ); //have to return because next does not cancel code execution.
   }
-  res.json({ places });
+  res.json({ places:place.toObject({getters: true}) });
 };
 
 const createPlace = async (req, res, next) => {
