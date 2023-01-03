@@ -27,15 +27,15 @@ app.use((error, req, res, next) => {
 });
 
 const connectUrl =
-  "mongodb+srv://tannguyen:dbpassword123@cluster0.j4p5kyv.mongodb.net/places?retryWrites=true&w=majority";
-// const connectConfig = {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   useCreateIndex: true,
-// };
+  "mongodb+srv://tannguyen:password1234@cluster0.2tukmzl.mongodb.net/places?retryWrites=true&w=majority";
+const connectConfig = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
 
 mongoose
-  .connect(connectUrl)
+  .set('strictQuery', true)
+  .connect(connectUrl, connectConfig)
   .then(() => {
     console.log("+++ Database connected! +++");
     app.listen(5000);
