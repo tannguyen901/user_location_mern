@@ -10,6 +10,7 @@ import Button from "../../shared/components/FormElements/Button";
 import "./Authenticate.css";
 import Card from "../../shared/components/UIElements/Card";
 import { AuthContext } from "../../shared/context/auth-context";
+import axiosUsers from "../../axios-users";
 
 const Authenticate = () => {
   const auth = useContext(AuthContext);
@@ -52,10 +53,26 @@ const Authenticate = () => {
     setIsLoginMode((prevMode) => !prevMode);
   };
 
-  const authSubmitHandler = (evt) => {
+  const authSubmitHandler = async (evt) => {
     evt.preventDefault();
-    console.log(formState.inputs);
-    auth.login();
+
+    if (isLoginMode) {
+    } else {
+      const postData = JSON.stringify({
+        name: formState.inputs.name.value,
+        email: formState.inputs.email.value,
+        password: formState.inputs.password.value,
+      });
+      axiosUsers
+        .post("signup", postData)
+        .then((response) => {
+          console.log(response.data);
+          auth.login();
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+        });
+    }
   };
 
   return (
