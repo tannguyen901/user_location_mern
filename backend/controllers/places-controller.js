@@ -1,25 +1,10 @@
 const HttpError = require("../models/http-error");
-const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const Places = require("../models/place");
 const User = require("../models/user");
 const mongoose = require("mongoose");
 
 const getCoordsForAddress = require("../util/location");
-
-let DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 34th St, New York, NY 10001",
-    creator: "u1",
-  },
-];
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
@@ -134,7 +119,6 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  // DUMMY_PLACES.push(createdPlace);
   res.status(201).json({ place: createdPlace });
 };
 
@@ -178,13 +162,22 @@ const deletePlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
   let place;
   try {
-    place = Places.findById(placeId);
+    place = await Places.findById(placeId).populate("creator");
   } catch (err) {
-    return next(new HttpError("couldt not find the place to be deleted", 500));
+    return next(new HttpError("could not find the place to be deleted", 500));
+  }
+
+  if (!place) {
+    return next(new HttpError("Could not find place for this id.", 404));
   }
 
   try {
-    place = await Places.deleteOne({ id: placeId });
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await place.remove({ session: sess });
+    place.creator.places.pull(place);
+    await place.creator.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
     return next(
       new HttpError("something went wrong, could not delete the place", 500)
@@ -192,7 +185,7 @@ const deletePlaceById = async (req, res, next) => {
   }
   res
     .status(200)
-    .json({ message: `Deleted ${place.deletedCount} document(s).` });
+    .json({ message: `Deleted place` });
 };
 
 exports.getPlaceById = getPlaceById;
