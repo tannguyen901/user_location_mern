@@ -2,17 +2,18 @@ const HttpError = require("../models/http-error");
 const User = require("../models/user");
 const { validationResult } = require("express-validator");
 
-const DUMMY_USERS = [
-  {
-    id: "u1",
-    name: "tan nguyen",
-    email: "test@test.com",
-    password: "testers",
-  },
-];
+const getAllUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password"); //or "email name"
+  } catch (err) {
+    return next(
+      new HttpError("Fetching users failed, please try again later.", 500)
+    );
+  }
+  // res.json({ users: users.map((user) =>  {return user.toObject({ getters: true })}) });
+  res.json({users: users.map(user => user.toObject({ getters: true }))});
 
-const getAllUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
 };
 
 const signup = async (req, res, next) => {
@@ -20,7 +21,7 @@ const signup = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return next(new HttpError("Invalid email or password", 422));
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -43,7 +44,7 @@ const signup = async (req, res, next) => {
     email,
     password,
     image: "https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg",
-    places,
+    places : [],
   });
 
   try {
