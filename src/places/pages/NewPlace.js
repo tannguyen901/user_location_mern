@@ -7,8 +7,10 @@ import {
 import Input from "../../shared/components/FormElements/Input";
 import "./PlaceForm.css";
 import { useForm } from "../../shared/components/hooks/form-hooks";
+import { useHttpClient } from "../../shared/components/hooks/http-hook";
 
 const NewPlace = () => {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, inputHandler] = useForm(
     {
       title: {
@@ -29,7 +31,15 @@ const NewPlace = () => {
 
   const placeSubmitHandler = (event) => {
     event.preventDefault();
-    console.log(formState.inputs); //later send this information to backend
+    sendRequest(
+      "http://localhost:5000/api/places",
+      "POST",
+      JSON.stringify({
+        title: formState.title.value,
+        description: formState.description.value,
+        address: formState.address.value,
+      })
+    );
   };
 
   return (
