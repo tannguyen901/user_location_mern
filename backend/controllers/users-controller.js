@@ -12,8 +12,7 @@ const getAllUsers = async (req, res, next) => {
     );
   }
   // res.json({ users: users.map((user) =>  {return user.toObject({ getters: true })}) });
-  res.json({users: users.map(user => user.toObject({ getters: true }))});
-
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
@@ -44,7 +43,7 @@ const signup = async (req, res, next) => {
     email,
     password,
     image: "https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg",
-    places : [],
+    places: [],
   });
 
   try {
@@ -77,7 +76,10 @@ const login = async (req, res, next) => {
     );
   }
 
-  res.json({ message: "Logged in!" });
+  res.json({
+    message: "Logged in!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getAllUsers = getAllUsers;

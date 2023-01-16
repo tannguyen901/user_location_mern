@@ -17,7 +17,7 @@ import { useHttpClient } from "../../shared/components/hooks/http-hook";
 const Authenticate = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient;
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -61,29 +61,38 @@ const Authenticate = () => {
     evt.preventDefault();
 
     if (isLoginMode) {
-      // url, method, body, header parameters for sendRequest
-      const responseData = await sendRequest(
-        "http://localhost:5000/api/users/login",
-        "POST",
-        JSON.stringify({
-          email: formState.inputs.email.value,
-          password: formState.inputs.password.value,
-        }),
-        {
-          "Content-Type": "application/json",
-        }
-      ).then(auth.login());
+      try {
+        // url, method, body, header parameters for sendRequest
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users/login',
+          'POST',
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            'Content-Type': 'application/json',
+          }
+        );
+        auth.login(responseData.user.id);
+      } catch (err) {}
     } else {
-      await sendRequest(
-        "http://localhost:5000/api/users/signup",
-        "POST",
-        JSON.stringify({
-          name: formState.inputs.name.value,
-          email: formState.inputs.email.value,
-          password: formState.inputs.password.value,
-        }),
-        { "Content-Type": "application/json" }
-      ).then(auth.login());
+      try {
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users/signup',
+          'POST',
+          JSON.stringify({
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          { 
+            'Content-Type': 'application/json' 
+          }
+        );
+
+        auth.login(responseData.user.id);
+      } catch (err) {}
     }
   };
 
