@@ -40,6 +40,7 @@ const Authenticate = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -48,9 +49,13 @@ const Authenticate = () => {
         {
           ...formState.inputs,
           name: {
-            value: "",
+            value: '',
             isValid: false,
           },
+          image: {
+            value: null,
+            isValid: false
+          }
         },
         false
       );
@@ -61,35 +66,35 @@ const Authenticate = () => {
   const authSubmitHandler = async (evt) => {
     evt.preventDefault();
 
+    console.log(formState.inputs);
+
     if (isLoginMode) {
       try {
         // url, method, body, header parameters for sendRequest
         const responseData = await sendRequest(
-          'http://localhost:5000/api/users/login',
-          'POST',
+          "http://localhost:5000/api/users/login",
+          "POST",
           JSON.stringify({
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }),
           {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           }
         );
         auth.login(responseData.user.id);
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append('email', formState.inputs.email.value);
+        formData.append('name', formState.inputs.name.value);
+        formData.append('password', formState.inputs.password.value);
+        formData.append('image')
         const responseData = await sendRequest(
-          'http://localhost:5000/api/users/signup',
-          'POST',
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          { 
-            'Content-Type': 'application/json' 
-          }
+          "http://localhost:5000/api/users/signup",
+          "POST",
+          formData
         );
 
         auth.login(responseData.user.id);
@@ -117,7 +122,9 @@ const Authenticate = () => {
             />
           )}
 
-          {!isLoginMode && <ImageUpload center id="image" />}
+          {!isLoginMode && (
+            <ImageUpload center id="image" onInput={inputHandler} />
+          )}
           <Input
             id="email"
             element="input"
