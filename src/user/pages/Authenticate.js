@@ -49,13 +49,13 @@ const Authenticate = () => {
         {
           ...formState.inputs,
           name: {
-            value: '',
+            value: "",
             isValid: false,
           },
           image: {
             value: null,
-            isValid: false
-          }
+            isValid: false,
+          },
         },
         false
       );
@@ -65,8 +65,6 @@ const Authenticate = () => {
 
   const authSubmitHandler = async (evt) => {
     evt.preventDefault();
-
-    console.log(formState.inputs);
 
     if (isLoginMode) {
       try {
@@ -86,16 +84,17 @@ const Authenticate = () => {
       } catch (err) {}
     } else {
       try {
+        // use formData because image cannot be in json format 
         const formData = new FormData();
-        formData.append('email', formState.inputs.email.value);
-        formData.append('name', formState.inputs.name.value);
-        formData.append('password', formState.inputs.password.value);
+        formData.append("email", formState.inputs.email.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
         //look for this in user route signup
-        formData.append('image', formState.inputs.image.value)
+        formData.append("image", formState.inputs.image.value);
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          formData,
+          formData
         );
 
         auth.login(responseData.user.id);
@@ -124,7 +123,12 @@ const Authenticate = () => {
           )}
 
           {!isLoginMode && (
-            <ImageUpload center id="image" onInput={inputHandler} />
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image."
+            />
           )}
           <Input
             id="email"
